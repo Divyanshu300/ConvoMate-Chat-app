@@ -1,4 +1,4 @@
-    //create an instance of mongoose
+//create an instance of mongoose
 const mongoose = require("mongoose");
 
 //enabling to access environment file

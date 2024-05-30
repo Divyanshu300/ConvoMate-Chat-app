@@ -8,7 +8,8 @@
 
 [To be added](To be added)
 
-  
+
+  <br></br>
   
 <h2>🧐 Features</h2>
 
@@ -23,6 +24,9 @@ Here're some of the project's best features:
 *   Message Notifications :- Real-time notifications for new messages.
 *   Private Chat :- Team members can chat privately with the admin and other team members and Direct messaging accessible.
 
+
+ <br></br>
+ 
 <h2>🛠️ Installation Steps:</h2>
 
 <p>1. Clone the repository</p>
@@ -50,7 +54,9 @@ npm run start
 ```
 
   
-  
+
+ <br></br>
+ 
 <h2>💻 Built with</h2>
 
 Technologies used in the project :-
@@ -62,6 +68,7 @@ Technologies used in the project :-
 *   Cloudinary
 *   Vercel, Render for deploying the website
 
+ <br></br>
 <h2>🛡️ License:</h2>
 
 This project is licensed under the MIT License.

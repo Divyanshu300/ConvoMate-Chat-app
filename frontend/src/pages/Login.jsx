@@ -138,7 +138,7 @@ const Login = () => {
         >
           {isLogin ? (
             <>
-              <Typography variant="h5">Login</Typography>
+              <Typography variant="h5">Welcome Back!</Typography>
               <form
                 style={{
                   width: "100%",
@@ -190,7 +190,7 @@ const Login = () => {
                   variant="text"
                   onClick={toggleLogin}
                 >
-                  Sign Up Instead
+                  New User? SignUp
                 </Button>
               </form>
             </>
@@ -318,7 +318,7 @@ const Login = () => {
                   variant="text"
                   onClick={toggleLogin}
                 >
-                  Login Instead
+                  Already an User? Login
                 </Button>
               </form>
             </>

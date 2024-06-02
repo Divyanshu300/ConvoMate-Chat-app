@@ -15,7 +15,7 @@ const NotFound = () => {
         <ErrorIcon sx={{ fontSize: "10rem" }} />
         <Typography variant="h1">404</Typography>
         <Typography variant="h3">Not Found</Typography>
-        <Link to="/">Go back to home</Link>
+        <Link to="/">Go back to Home Page</Link>
       </Stack>
     </Container>
   );

@@ -13,7 +13,7 @@ const cookieOptions = {
 
 const connectDB = (uri) => {
   mongoose
-    .connect(uri, { dbName: "QuickChat" })
+    .connect(uri, { dbName: "ConvoMate" })
     .then((data) => console.log(`Connected to DB: ${data.connection.host}`))
     .catch((err) => {
       throw err;
@@ -23,7 +23,7 @@ const connectDB = (uri) => {
 const sendToken = (res, user, code, message) => {
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
-  return res.status(code).cookie("quickchat-token", token, cookieOptions).json({
+  return res.status(code).cookie("convomate-token", token, cookieOptions).json({
     success: true,
     user,
     message,

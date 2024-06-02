@@ -12,10 +12,10 @@ import {
 import React from "react";
 import { Doughnut, Line } from "react-chartjs-2";
 import {
-  orange,
-  orangeLight,
-  purple,
-  purpleLight,
+  bgBlue,
+  bgBlueLight,
+  pink,
+  pinkLight,
 } from "../../constants/color";
 import { getLast7Days } from "../../lib/features";
 
@@ -66,8 +66,8 @@ const LineChart = ({ value = [] }) => {
         data: value,
         label: "Messages",
         fill: true,
-        backgroundColor: purpleLight,
-        borderColor: purple,
+        backgroundColor: pinkLight,
+        borderColor: pink,
       },
     ],
   };
@@ -91,9 +91,9 @@ const DoughnutChart = ({ value = [], labels = [] }) => {
     datasets: [
       {
         data: value,
-        backgroundColor: [purpleLight, orangeLight],
-        hoverBackgroundColor: [purple, orange],
-        borderColor: [purple, orange],
+        backgroundColor: [pinkLight, bgBlueLight],
+        hoverBackgroundColor: [pink, bgBlue],
+        borderColor: [pink, bgBlue],
         offset: 40,
       },
     ],

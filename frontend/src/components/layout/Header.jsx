@@ -88,7 +88,7 @@ const Header = () => {
                 display: { xs: "none", sm: "block" },
               }}
             >
-              QuickChat
+              ConvoMate
             </Typography>
 
             <Box

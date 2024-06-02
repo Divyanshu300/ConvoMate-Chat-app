@@ -18,7 +18,7 @@ const adminLogin = TryCatch(async (req, res, next) => {
 
   return res
     .status(200)
-    .cookie("quickchat-admin-token", token, {
+    .cookie("convomate-admin-token", token, {
       ...cookieOptions,
       maxAge: 1000 * 60 * 15,
     })
@@ -31,7 +31,7 @@ const adminLogin = TryCatch(async (req, res, next) => {
 const adminLogout = TryCatch(async (req, res, next) => {
   return res
     .status(200)
-    .cookie("quickchat-admin-token", "", {
+    .cookie("convomate-admin-token", "", {
       ...cookieOptions,
       maxAge: 0,
     })

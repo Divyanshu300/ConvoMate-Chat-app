@@ -10,6 +10,6 @@ const corsOptions = {
 
 console.log(" hyy: ",process.env.CLIENT_URL);
 
-const QUICKCHAT_TOKEN = "quickchat-token";
+const CONVOMATE_TOKEN = "convomate-token";
 
-export { corsOptions, QUICKCHAT_TOKEN };
+export { corsOptions, CONVOMATE_TOKEN };

@@ -7,5 +7,5 @@ export const lightBlue = "#2694ab";
 export const matBlack = "#1c1c1c";
 export const bgGradient = "linear-gradient(rgb(22, 72, 99), rgb(66, 125, 157))";
 
-export const purple = "rgba(28, 22, 120, 1)";
-export const purpleLight = "rgba(133, 118, 255, 0.2)";
+export const pink = "rgba(142, 62, 99, 1)";
+export const pinkLight = "rgba(210, 100, 154, 0.2)";

@@ -151,3 +151,92 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
       message: "Friend Request Rejected",
     });
   }
+
+  const members = [request.sender._id, request.receiver._id];
+
+  await Promise.all([
+    Chat.create({
+      members,
+      name: `${request.sender.name}-${request.receiver.name}`,
+    }),
+    request.deleteOne(),
+  ]);
+
+  emitEvent(req, REFETCH_CHATS, members);
+
+  return res.status(200).json({
+    success: true,
+    message: "Friend Request Accepted",
+    senderId: request.sender._id,
+  });
+});
+
+const getMyNotifications = TryCatch(async (req, res) => {
+  const requests = await Request.find({ receiver: req.user }).populate(
+    "sender",
+    "name avatar"
+  );
+
+  const allRequests = requests.map(({ _id, sender }) => ({
+    _id,
+    sender: {
+      _id: sender._id,
+      name: sender.name,
+      avatar: sender.avatar.url,
+    },
+  }));
+
+  return res.status(200).json({
+    success: true,
+    allRequests,
+  });
+});
+
+const getMyFriends = TryCatch(async (req, res) => {
+  const chatId = req.query.chatId;
+
+  const chats = await Chat.find({
+    members: req.user,
+    groupChat: false,
+  }).populate("members", "name avatar");
+
+  const friends = chats.map(({ members }) => {
+    const otherUser = getOtherMember(members, req.user);
+
+    return {
+      _id: otherUser._id,
+      name: otherUser.name,
+      avatar: otherUser.avatar.url,
+    };
+  });
+
+  if (chatId) {
+    const chat = await Chat.findById(chatId);
+
+    const availableFriends = friends.filter(
+      (friend) => !chat.members.includes(friend._id)
+    );
+
+    return res.status(200).json({
+      success: true,
+      friends: availableFriends,
+    });
+  } else {
+    return res.status(200).json({
+      success: true,
+      friends,
+    });
+  }
+});
+
+export {
+  acceptFriendRequest,
+  getMyFriends,
+  getMyNotifications,
+  getMyProfile,
+  login,
+  logout,
+  newUser,
+  searchUser,
+  sendFriendRequest,
+};

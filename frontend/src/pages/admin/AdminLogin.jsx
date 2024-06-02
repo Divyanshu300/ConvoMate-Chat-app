@@ -55,7 +55,7 @@ const AdminLogin = () => {
             alignItems: "center",
           }}
         >
-          <Typography variant="h5">Admin Login</Typography>
+          <Typography variant="h5">Admin? Login!</Typography>
           <form
             style={{
               width: "100%",

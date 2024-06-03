@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.adminPic {
+    background-image: url('constants\data\adminbg.jpeg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.loginSignupPic {
+    background-image: url('constants/data/loginSignupBg.jpeg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.chatPic {
+    background-image: url('constants/data/chatBg.jpeg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}

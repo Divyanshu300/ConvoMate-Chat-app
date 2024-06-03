@@ -11,6 +11,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { bgGradient } from "../../constants/color";
 import { adminLogin, getAdmin } from "../../redux/thunks/admin";
+import adminbg from "../../constants/data/adminbg.jpeg";
+
+
 
 const AdminLogin = () => {
   const { isAdmin } = useSelector((state) => state.auth);
@@ -31,11 +34,7 @@ const AdminLogin = () => {
   if (isAdmin) return <Navigate to="/admin/dashboard" />;
 
   return (
-    <div
-      style={{
-        backgroundImage: bgGradient,
-      }}
-    >
+    <div className={`adminPic`}>
       <Container
         component={"main"}
         maxWidth="xs"
@@ -44,6 +43,7 @@ const AdminLogin = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          backgroundImage : "#2ffefe"
         }}
       >
         <Paper

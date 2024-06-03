@@ -10,7 +10,7 @@ import { transformImage } from "../../lib/features";
 
 const Profile = ({ user }) => {
   return (
-    <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
+    <Stack spacing={"2rem"} direction={"column"} alignItems={"center"} justifyContent={"center"}>
       <Avatar
         src={transformImage(user?.avatar?.url)}
         sx={{
@@ -42,7 +42,7 @@ const ProfileCard = ({ text, Icon, heading }) => (
     direction={"row"}
     alignItems={"center"}
     spacing={"1rem"}
-    color={"white"}
+    color={"black"}
     textAlign={"center"}
   >
     {Icon && Icon}

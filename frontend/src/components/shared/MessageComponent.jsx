@@ -5,6 +5,7 @@ import moment from "moment";
 import { fileFormat } from "../../lib/features";
 import RenderAttachment from "./RenderAttachment";
 import { motion } from "framer-motion";
+import { grayColor } from "../../constants/color";
 
 const MessageComponent = ({ message, user }) => {
   const { sender, content, attachments = [], createdAt } = message;
@@ -19,7 +20,7 @@ const MessageComponent = ({ message, user }) => {
       whileInView={{ opacity: 1, x: 0 }}
       style={{
         alignSelf: sameSender ? "flex-end" : "flex-start",
-        backgroundColor: "white",
+        backgroundColor: "#DDF2FD",
         color: "black",
         borderRadius: "5px",
         padding: "0.5rem",

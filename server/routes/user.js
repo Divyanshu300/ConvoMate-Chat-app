@@ -8,6 +8,7 @@ import {
   login,
   logout,
   newUser,
+  updateUser,
   searchUser,
   sendFriendRequest,
 } from "../controllers/user.js";
@@ -24,6 +25,7 @@ import { singleAvatar } from "../middlewares/multer.js";
 const app = express.Router();
 
 app.post("/new/", singleAvatar, registerValidator(), validateHandler, newUser);
+app.post("/updateUser/", singleAvatar, registerValidator(), validateHandler, updateUser);
 app.post("/login/", loginValidator(), validateHandler, login);
 
 // After here user must be logged in to access the routes

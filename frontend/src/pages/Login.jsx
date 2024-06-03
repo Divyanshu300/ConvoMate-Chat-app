@@ -112,11 +112,7 @@ const Login = () => {
   };
 
   return (
-    <div
-      style={{
-        backgroundImage: bgGradient,
-      }}
-    >
+    <div className="loginSignupPic">
       <Container
         component={"main"}
         maxWidth="xs"

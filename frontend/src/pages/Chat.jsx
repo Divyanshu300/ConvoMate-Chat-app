@@ -184,11 +184,12 @@ const Chat = ({ chatId, user }) => {
   ) : (
     <Fragment>
       <Stack
+       className="chatPic"
         ref={containerRef}
         boxSizing={"border-box"}
         padding={"1rem"}
         spacing={"1rem"}
-        bgcolor={grayColor}
+        // bgcolor={grayColor}
         height={"90%"}
         sx={{
           overflowX: "hidden",

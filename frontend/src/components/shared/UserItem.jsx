@@ -41,7 +41,7 @@ const UserItem = ({
         <IconButton
           size="small"
           sx={{
-            bgcolor: isAdded ? "error.main" : "primary.main",
+            bgcolor: isAdded ? "error.main" : "#164863",
             color: "white",
             "&:hover": {
               bgcolor: isAdded ? "error.dark" : "primary.dark",

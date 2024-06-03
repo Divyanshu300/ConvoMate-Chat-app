@@ -18,9 +18,10 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { Link as LinkComponent, Navigate, useLocation } from "react-router-dom";
-import { grayColor, matBlack } from "../../constants/color";
+import { bgBlue, grayColor, matBlack } from "../../constants/color";
 import { useDispatch, useSelector } from "react-redux";
 import { adminLogout } from "../../redux/thunks/admin";
+
 
 const Link = styled(LinkComponent)`
   text-decoration: none;
@@ -65,18 +66,18 @@ const Sidebar = ({ w = "100%" }) => {
 
   return (
     <Stack width={w} direction={"column"} p={"3rem"} spacing={"3rem"}>
-      <Typography variant="h5" textTransform={"uppercase"}>
-        QuickChat
+      <Typography variant="h5" textTransform={"uppercase"} color={bgBlue}>
+        ConvoMate
       </Typography>
 
-      <Stack spacing={"1rem"}>
+      <Stack spacing={"1rem"} >
         {adminTabs.map((tab) => (
           <Link
             key={tab.path}
             to={tab.path}
             sx={
               location.pathname === tab.path && {
-                bgcolor: matBlack,
+                bgcolor: bgBlue,
                 color: "white",
                 ":hover": { color: "white" },
               }

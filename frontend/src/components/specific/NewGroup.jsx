@@ -19,6 +19,7 @@ import {
 import { useAsyncMutation, useErrors } from "../../hooks/hook";
 import { setIsNewGroup } from "../../redux/reducers/misc";
 import toast from "react-hot-toast";
+import {bgBlue} from "../../constants/color";
 
 const NewGroup = () => {
   const { isNewGroup } = useSelector((state) => state.misc);

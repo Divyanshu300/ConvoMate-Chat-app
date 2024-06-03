@@ -26,6 +26,7 @@ import Title from "../shared/Title";
 import ChatList from "../specific/ChatList";
 import Profile from "../specific/Profile";
 import Header from "./Header";
+import { bgBlueLight } from "../../constants/color";
 
 const AppLayout = () => (WrappedComponent) => {
   return (props) => {
@@ -148,7 +149,7 @@ const AppLayout = () => (WrappedComponent) => {
             sx={{
               display: { xs: "none", md: "block" },
               padding: "2rem",
-              bgcolor: "rgba(0,0,0,0.85)",
+              bgcolor: bgBlueLight,
             }}
           >
             <Profile user={user} />

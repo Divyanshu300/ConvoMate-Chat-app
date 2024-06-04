@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .adminPic {
-    background-image: url('constants\data\adminbg.jpeg');
+    background-image: url('constants/data/adminbg.jpeg');
     background-repeat: no-repeat;
     background-size: cover;
 }

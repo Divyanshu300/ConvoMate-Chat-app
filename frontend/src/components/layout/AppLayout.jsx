@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+  MESSAGE_EDITED,
   NEW_MESSAGE_ALERT,
   NEW_REQUEST,
   ONLINE_USERS,
@@ -55,6 +56,7 @@ const AppLayout = () => (WrappedComponent) => {
     
       // Example socket event listener
       socket.on("userUpdate", handleUserUpdate);
+      
     
       return () => {
         // Clean up event listener when component unmounts

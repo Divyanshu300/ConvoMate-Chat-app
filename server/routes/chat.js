@@ -11,6 +11,7 @@ import {
   removeMember,
   renameGroup,
   sendAttachments,
+  editMessage
 } from "../controllers/chat.js";
 import {
   addMemberValidator,
@@ -65,5 +66,8 @@ app
   .get(chatIdValidator(), validateHandler, getChatDetails)
   .put(renameValidator(), validateHandler, renameGroup)
   .delete(chatIdValidator(), validateHandler, deleteChat);
+
+
+app.post("/editmessage", isAuthenticated, editMessage);
 
 export default app;

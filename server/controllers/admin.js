@@ -205,37 +205,6 @@ const allMessages = TryCatch(async (req, res) => {
     .populate("sender", "name avatar")
     .populate("chat", "groupChat");
 
-    
-    // console.log("inside all messages: ",messages);
-    // for(let i=0;i<messages;i++){
-    //   console.log("message id: ",i._id);
-    // }
-   
-  // try{
-  //   const transformedMessages = messages.map(
-  //     ({ content, attachments, _id, sender, createdAt, chat }) => ({
-  //       _id,
-  //       attachments,
-  //       content,
-  //       createdAt,
-  //       chat: chat._id,
-  //       groupChat: chat.groupChat,
-  //       sender: {
-  //         _id: sender._id,
-  //         name: sender.name,
-  //         avatar: sender.avatar.url,
-  //       },
-  //     })
-  //   );
-  //   return res.status(200).json({
-  //     success: true,
-  //     messages: transformedMessages,
-  //   });
-  // }
-  // catch(error){
-  //   console.log("error ",error);
-  // }
-
   try {
     const transformedMessages = messages.map((message) => {
       const { content, attachments, _id, sender, createdAt, chat } = message;

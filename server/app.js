@@ -24,7 +24,7 @@ import {
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
-import { socketAuthenticator } from "./middlewares/auth.js";
+import { isAuthenticated, socketAuthenticator } from "./middlewares/auth.js";
 
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
@@ -76,7 +76,8 @@ app.use(express.json());
 app.use(cookieParser());
 // corsOptions
 app.use(cors(corsOptions));
-app.delete("/api/v1/admin/users/deleteUser" , async(req,res)=>{
+
+app.delete("/api/v1/admin/users/deleteUser" ,isAuthenticated, async(req,res)=>{
   console.log("here.....")
   const { userId } = req.body;
 
@@ -141,6 +142,8 @@ app.delete("/api/v1/admin/users/deleteUser" , async(req,res)=>{
     message : "user deleted successfully"
   })
 })
+
+
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/chat", chatRoute);
 app.use("/api/v1/admin", adminRoute);
@@ -237,8 +240,7 @@ io.on("connection", (socket) => {
         reaction,
         userId,
       });
-       // Notify clients to refetch chats
-      //  io.to(membersSocket).emit(REFETCH_CHATS, { chatId });
+      
     }
   });
 

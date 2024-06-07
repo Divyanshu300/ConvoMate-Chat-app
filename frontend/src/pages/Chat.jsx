@@ -1,5 +1,6 @@
 import React, {
   Fragment,
+  createRef,
   useCallback,
   useEffect,
   useRef,
@@ -12,6 +13,7 @@ import {
   AttachFile as AttachFileIcon,
   Send as SendIcon,
 } from "@mui/icons-material";
+
 import { InputBox } from "../components/styles/StyledComponents";
 import FileMenu from "../components/dialogs/FileMenu";
 import MessageComponent from "../components/shared/MessageComponent";
@@ -23,6 +25,10 @@ import {
   NEW_MESSAGE,
   START_TYPING,
   STOP_TYPING,
+  // message reaction
+  MESSAGE_REACTION,
+  // REFETCH_CHATS,
+
 } from "../constants/events";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { useErrors, useSocketEvents } from "../hooks/hook";
@@ -32,6 +38,14 @@ import { setIsFileMenu } from "../redux/reducers/misc";
 import { removeNewMessagesAlert } from "../redux/reducers/chat";
 import { TypingLoader } from "../components/layout/Loaders";
 import { useNavigate } from "react-router-dom";
+
+// import EmojiPicker from 'emoji-picker-react';
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+
+// // emoji add
+// import 'emoji-mart/css/emoji-mart.css';
+import  Picker from '@emoji-mart/react';
+import data from '@emoji-mart/data';
 
 const Chat = ({ chatId, user }) => {
   const socket = getSocket();
@@ -46,10 +60,17 @@ const Chat = ({ chatId, user }) => {
   const [page, setPage] = useState(1);
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
 
+  const [isPickerVisible, setPickerVisible] = useState(false);
+  const [currentEmoji, setCurrentEmoji] = useState(null);
+  // message reaction
+  const [selectedMessageId, setSelectedMessageId] = useState(null);
+
+
   const [IamTyping, setIamTyping] = useState(false);
   const [userTyping, setUserTyping] = useState(false);
   const typingTimeout = useRef(null);
 
+  // const { data: chatDetailsData, refetch: refetchChatDetails } 
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
 
   const oldMessagesChunk = useGetMessagesQuery({ chatId, page });
@@ -70,7 +91,11 @@ const Chat = ({ chatId, user }) => {
   const members = chatDetails?.data?.chat?.members;
 
   const messageOnChange = (e) => {
-    setMessage(e.target.value);
+  
+    // emoji + text message
+    const value = e.native ? message + e.native : e.target.value;
+    setMessage(value);
+
 
     if (!IamTyping) {
       socket.emit(START_TYPING, { members, chatId });
@@ -166,18 +191,61 @@ const Chat = ({ chatId, user }) => {
     [chatId]
   );
 
+
+  // message reaction
+  const reactionListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === data.messageId
+            ? { ...msg, reactions: [...msg.reactions, data.reaction] }
+            : msg
+        )
+      );
+    },
+    [chatId]
+  );
+
+  // const refetchChatsListener = useCallback(
+  //   (data) => {
+  //     if (data.chatId !== chatId) return;
+  //     refetchChatDetails();
+  //   },
+  //   [chatId, refetchChatDetails]
+  // );
+
   const eventHandler = {
     [ALERT]: alertListener,
     [NEW_MESSAGE]: newMessagesListener,
     [START_TYPING]: startTypingListener,
     [STOP_TYPING]: stopTypingListener,
+    // message reaction
+    [MESSAGE_REACTION]: reactionListener,
+    // [REFETCH_CHATS]: refetchChatsListener,
   };
+
+
 
   useSocketEvents(socket, eventHandler);
 
   useErrors(errors);
 
   const allMessages = [...oldMessages, ...messages];
+
+
+  // message reaction
+  const handleEmojiReaction = (emoji, messageId) => {
+    socket.emit(MESSAGE_REACTION, { chatId, messageId, reaction: emoji.native });
+    setPickerVisible(false);
+    setSelectedMessageId(null);
+  };
+
+  // message reaction
+  const toggleEmojiPicker = (messageId) => {
+    setSelectedMessageId(messageId);
+    setPickerVisible(!isPickerVisible);
+  };
 
   return chatDetails.isLoading ? (
     <Skeleton />
@@ -196,8 +264,9 @@ const Chat = ({ chatId, user }) => {
           overflowY: "auto",
         }}
       >
-        {allMessages.map((i) => (
-          <MessageComponent key={i._id} message={i} user={user} />
+        {allMessages.map((msg) => (
+          // <div   >
+            <MessageComponent key={msg._id} message={msg} user={user} toggleEmojiPicker = {toggleEmojiPicker}/>
         ))}
 
         {userTyping && <TypingLoader />}
@@ -221,7 +290,7 @@ const Chat = ({ chatId, user }) => {
           <IconButton
             sx={{
               position: "absolute",
-              left: "1.5rem",
+              left: "1rem",
               rotate: "30deg",
             }}
             onClick={handleFileOpen}
@@ -229,7 +298,44 @@ const Chat = ({ chatId, user }) => {
             <AttachFileIcon />
           </IconButton>
 
-          <InputBox
+          {/* Emoji picker add */}
+          <IconButton
+            sx={{
+              position: "absolute",
+              left: "2.5rem",
+            }}
+            onClick={ ()=>setPickerVisible(!isPickerVisible) }
+          >
+            <EmojiEmotionsIcon/>
+          </IconButton>
+
+
+          <div className="absolute bottom-full translate-y-2">
+            <div className={isPickerVisible ? 'block' : 'hidden'}>
+
+              <Picker data={data} previewPosition='none' 
+                // onEmojiSelect={(e) => messageOnChange(e)}
+                onEmojiSelect={(emoji) =>
+                  selectedMessageId
+                    ? handleEmojiReaction(emoji, selectedMessageId)
+                    : messageOnChange(emoji)
+                }
+                  // (e)=>
+                  // setCurrentEmoji(e.native);
+                  // setPickerVisible(!isPickerVisible);
+                  // messageOnChange(e)
+                  onClickOutside={ ()=>setPickerVisible(!isPickerVisible) }
+                  theme="light"
+                  // theme="dark" makes the picker background color dark black
+              />
+            </div>
+          </div>
+
+
+          <InputBox 
+            sx={{
+              paddingLeft: "4rem"
+            }}
             placeholder="Type Message Here..."
             value={message}
             onChange={messageOnChange}

@@ -10,6 +10,7 @@ import { v4 as uuid } from "uuid";
 import cors from "cors";
 import { v2 as cloudinary } from "cloudinary";
 import {
+  // REFETCH_CHATS,
   CHAT_JOINED,
   CHAT_LEAVED,
   NEW_MESSAGE,
@@ -17,6 +18,8 @@ import {
   ONLINE_USERS,
   START_TYPING,
   STOP_TYPING,
+  // message reaction
+  MESSAGE_REACTION,
 } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
@@ -30,6 +33,16 @@ import adminRoute from "./routes/admin.js";
 dotenv.config({
   path: "./.env",
 });
+
+
+// import { Chat } from "../models/chat.js";
+// import { User } from "../models/user.js";
+// import { Request } from "../models/request.js";
+
+import { Chat } from "./models/chat.js";
+import { User } from "./models/user.js";
+import { Request } from "./models/request.js";
+
 
 const mongoURI = process.env.MONGO_URI;
 const port = process.env.PORT || 4000;
@@ -63,7 +76,71 @@ app.use(express.json());
 app.use(cookieParser());
 // corsOptions
 app.use(cors(corsOptions));
+app.delete("/api/v1/admin/users/deleteUser" , async(req,res)=>{
+  console.log("here.....")
+  const { userId } = req.body;
 
+  console.log(userId);
+
+  
+
+  // Find and remove chats where the user is the creator
+  const createdChats = await Chat.find({ creator: userId });
+  for (const chat of createdChats) {
+    await Chat.deleteOne({ _id: chat._id });
+  }
+
+  // Find chats where the user is a member
+  const memberChats = await Chat.find({ members: userId });
+  for (const chat of memberChats) {
+    if (!chat.groupChat) {
+      // If it's not a group chat, delete the entire chat
+      await Chat.deleteOne({ _id: chat._id });
+    } else {
+      // If it is a group chat, remove the user from the members list
+      chat.members.pull(userId);
+      await chat.save();
+    }
+  }
+
+  // Optionally, delete chats that have no members left (to clean up orphaned chats)
+  const emptyChats = await Chat.find({ members: { $size: 0 } });
+  for (const chat of emptyChats) {
+    await Chat.deleteOne({ _id: chat._id });
+  }
+
+  // Find and remove messages sent by the user
+  const userMessages = await Message.find({ sender: userId });
+  for (const message of userMessages) {
+    await Message.deleteOne({ _id: message._id });
+  }
+
+  // Remove the user's reactions from all messages
+  const reactedMessages = await Message.find({ 'reactions.userId': userId });
+  for (const message of reactedMessages) {
+    message.reactions = message.reactions.filter(reaction => reaction.userId.toString() !== userId);
+    await message.save();
+  }
+
+  // Find and remove requests where the user is the sender or receiver
+  const requests = await Request.find({
+    $or: [{ sender: userId }, { receiver: userId }]
+  });
+  for (const request of requests) {
+    await Request.deleteOne({ _id: request._id });
+  }
+
+
+  // Delete the user
+  await User.findByIdAndDelete(userId);
+
+  io.emit("userUpdate" )
+
+  return res.status(200).json({
+    success : true ,
+    message : "user deleted successfully"
+  })
+})
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/chat", chatRoute);
 app.use("/api/v1/admin", adminRoute);
@@ -71,6 +148,7 @@ app.use("/api/v1/admin", adminRoute);
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
+
 
 
 io.use((socket, next) => {
@@ -140,6 +218,30 @@ io.on("connection", (socket) => {
     const membersSocket = getSockets(members);
     io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
   });
+
+
+
+  
+  // Handling emoji reactions to messages
+  socket.on(MESSAGE_REACTION, async ({ chatId, messageId, reaction, userId }) => {
+    const message = await Message.findById(messageId);
+
+    if (message) {
+      message.reactions.push({ userId, reaction });
+      await message.save();
+
+      const membersSocket = getSockets(message.chat.members);
+      io.to(membersSocket).emit(MESSAGE_REACTION, {
+        chatId,
+        messageId,
+        reaction,
+        userId,
+      });
+       // Notify clients to refetch chats
+      //  io.to(membersSocket).emit(REFETCH_CHATS, { chatId });
+    }
+  });
+
 
   socket.on("disconnect", () => {
     userSocketIDs.delete(user._id.toString());

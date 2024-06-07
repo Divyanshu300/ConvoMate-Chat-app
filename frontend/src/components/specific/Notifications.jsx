@@ -24,6 +24,8 @@ const Notifications = () => {
 
   const { isLoading, data, error, isError } = useGetNotificationsQuery();
 
+    console.log("datat...",data)
+
   const [acceptRequest] = useAsyncMutation(useAcceptFriendRequestMutation);
 
   const friendRequestHandler = async ({ _id, accept }) => {
@@ -52,6 +54,7 @@ const Notifications = () => {
                   handler={friendRequestHandler}
                   key={_id}
                 />
+                
               ))
             ) : (
               <Typography textAlign={"center"}>0 notifications</Typography>

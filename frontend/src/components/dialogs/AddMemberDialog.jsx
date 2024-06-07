@@ -20,16 +20,19 @@ const AddMemberDialog = ({ chatId }) => {
   const dispatch = useDispatch();
 
   const { isAddMember } = useSelector((state) => state.misc);
+  const { user } = useSelector((state) => state.auth);
 
   const { isLoading, data, isError, error } = useAvailableFriendsQuery(chatId);
 
   const [addMembers, isLoadingAddMembers] = useAsyncMutation(
     useAddGroupMembersMutation
   );
-
+  
   const [selectedMembers, setSelectedMembers] = useState([]);
 
   const selectMemberHandler = (id) => {
+    // console.log("meriId",id)
+    console.log("hello ji",user)
     setSelectedMembers((prev) =>
       prev.includes(id)
         ? prev.filter((currElement) => currElement !== id)

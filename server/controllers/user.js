@@ -200,20 +200,22 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
 });
 
 const getMyNotifications = TryCatch(async (req, res) => {
+  console.log('user',req.user)
   const requests = await Request.find({ receiver: req.user }).populate(
     "sender",
     "name avatar"
   );
-
+  console.log("nkknk",requests)
+  console.log(requests[0]?.sender?.avatar?.url)
   const allRequests = requests.map(({ _id, sender }) => ({
     _id,
     sender: {
       _id: sender._id,
       name: sender.name,
-      avatar: sender.avatar.url,
+      avatar: sender?.avatar?.url,
     },
   }));
-
+  console.log("allreq..................",allRequests)
   return res.status(200).json({
     success: true,
     allRequests,

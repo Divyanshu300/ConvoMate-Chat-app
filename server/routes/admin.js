@@ -3,6 +3,7 @@ import {
   adminLogin,
   adminLogout,
   allChats,
+  deleteUser,
   allMessages,
   allUsers,
   getAdminData,
@@ -24,6 +25,7 @@ app.use(adminOnly);
 app.get("/", getAdminData);
 
 app.get("/users", allUsers);
+// app.delete("/users/deleteUser", deleteUser);
 app.get("/chats", allChats);
 app.get("/messages", allMessages);
 

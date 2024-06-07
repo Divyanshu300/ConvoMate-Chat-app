@@ -28,6 +28,7 @@ import Profile from "../specific/Profile";
 import Header from "./Header";
 import { bgBlueLight } from "../../constants/color";
 
+
 const AppLayout = () => (WrappedComponent) => {
   return (props) => {
     const params = useParams();
@@ -45,6 +46,21 @@ const AppLayout = () => (WrappedComponent) => {
     const { newMessagesAlert } = useSelector((state) => state.chat);
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
+
+    useEffect(() => {
+      const handleUserUpdate = () => {
+        // Refresh the page when a "userUpdate" event is received
+        window.location.reload();
+      };
+    
+      // Example socket event listener
+      socket.on("userUpdate", handleUserUpdate);
+    
+      return () => {
+        // Clean up event listener when component unmounts
+        socket.off("userUpdate", handleUserUpdate);
+      };
+    }, []);
 
     useErrors([{ isError, error }]);
 

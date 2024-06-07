@@ -6,6 +6,29 @@ import { User } from "../models/user.js";
 import { ErrorHandler } from "../utils/utility.js";
 import { cookieOptions } from "../utils/features.js";
 import { adminSecretKey } from "../app.js";
+import { Request } from "../models/request.js";
+import { Server , Socket } from "socket.io";
+import { corsOptions } from "../constants/config.js";
+import http from "http";
+import express from "express"
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: corsOptions,
+});
+
+// Add this listener for socket connection
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  // Example of emitting an event when a user disconnects
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
+
+
 
 const adminLogin = TryCatch(async (req, res, next) => {
   const { secretKey } = req.body;
@@ -75,6 +98,73 @@ const allUsers = TryCatch(async (req, res) => {
 });
 
 
+const deleteUser = TryCatch(async (req, res , next) => {
+
+  
+  const { userId } = req.body;
+
+  console.log(userId);
+
+  
+
+  // Find and remove chats where the user is the creator
+  const createdChats = await Chat.find({ creator: userId });
+  for (const chat of createdChats) {
+    await Chat.deleteOne({ _id: chat._id });
+  }
+
+  // Find chats where the user is a member
+  const memberChats = await Chat.find({ members: userId });
+  for (const chat of memberChats) {
+    if (!chat.groupChat) {
+      // If it's not a group chat, delete the entire chat
+      await Chat.deleteOne({ _id: chat._id });
+    } else {
+      // If it is a group chat, remove the user from the members list
+      chat.members.pull(userId);
+      await chat.save();
+    }
+  }
+
+  // Optionally, delete chats that have no members left (to clean up orphaned chats)
+  const emptyChats = await Chat.find({ members: { $size: 0 } });
+  for (const chat of emptyChats) {
+    await Chat.deleteOne({ _id: chat._id });
+  }
+
+  // Find and remove messages sent by the user
+  const userMessages = await Message.find({ sender: userId });
+  for (const message of userMessages) {
+    await Message.deleteOne({ _id: message._id });
+  }
+
+  // Remove the user's reactions from all messages
+  const reactedMessages = await Message.find({ 'reactions.userId': userId });
+  for (const message of reactedMessages) {
+    message.reactions = message.reactions.filter(reaction => reaction.userId.toString() !== userId);
+    await message.save();
+  }
+
+  // Find and remove requests where the user is the sender or receiver
+  const requests = await Request.find({
+    $or: [{ sender: userId }, { receiver: userId }]
+  });
+  for (const request of requests) {
+    await Request.deleteOne({ _id: request._id });
+  }
+
+
+  // Delete the user
+  await User.findByIdAndDelete(userId);
+
+  io.emit("userUpdate" )
+
+  return res.status(200).json({
+    success : true ,
+    message : "user deleted successfully"
+  })
+});
+
 const allChats = TryCatch(async (req, res) => {
   const chats = await Chat.find({})
     .populate("members", "name avatar")
@@ -115,26 +205,76 @@ const allMessages = TryCatch(async (req, res) => {
     .populate("sender", "name avatar")
     .populate("chat", "groupChat");
 
-  const transformedMessages = messages.map(
-    ({ content, attachments, _id, sender, createdAt, chat }) => ({
-      _id,
-      attachments,
-      content,
-      createdAt,
-      chat: chat._id,
-      groupChat: chat.groupChat,
-      sender: {
-        _id: sender._id,
-        name: sender.name,
-        avatar: sender.avatar.url,
-      },
-    })
-  );
+    
+    // console.log("inside all messages: ",messages);
+    // for(let i=0;i<messages;i++){
+    //   console.log("message id: ",i._id);
+    // }
+   
+  // try{
+  //   const transformedMessages = messages.map(
+  //     ({ content, attachments, _id, sender, createdAt, chat }) => ({
+  //       _id,
+  //       attachments,
+  //       content,
+  //       createdAt,
+  //       chat: chat._id,
+  //       groupChat: chat.groupChat,
+  //       sender: {
+  //         _id: sender._id,
+  //         name: sender.name,
+  //         avatar: sender.avatar.url,
+  //       },
+  //     })
+  //   );
+  //   return res.status(200).json({
+  //     success: true,
+  //     messages: transformedMessages,
+  //   });
+  // }
+  // catch(error){
+  //   console.log("error ",error);
+  // }
 
-  return res.status(200).json({
-    success: true,
-    messages: transformedMessages,
-  });
+  try {
+    const transformedMessages = messages.map((message) => {
+      const { content, attachments, _id, sender, createdAt, chat } = message;
+  
+      // Add checks to ensure chat and sender are not null or undefined
+      if (!chat || !sender) {
+        console.error("Message with missing chat or sender:", message);
+        // Skip this message or handle it as per your requirement
+        return null;
+      }
+  
+      // Proceed with the transformation if checks pass
+      return {
+        _id,
+        attachments,
+        content,
+        createdAt,
+        chat: chat._id,
+        groupChat: chat.groupChat,
+        sender: {
+          _id: sender._id,
+          name: sender.name,
+          avatar: sender.avatar.url,
+        },
+      };
+    }).filter(Boolean); // Remove null values from the array
+  
+    return res.status(200).json({
+      success: true,
+      messages: transformedMessages,
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+  
 });
 
 const getDashboardStats = TryCatch(async (req, res) => {
@@ -185,6 +325,7 @@ const getDashboardStats = TryCatch(async (req, res) => {
 
 export {
   allUsers,
+  deleteUser,
   allChats,
   allMessages,
   getDashboardStats,

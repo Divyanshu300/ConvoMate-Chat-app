@@ -20,6 +20,7 @@ import UserItem from "../shared/UserItem";
 
 const Search = () => {
   const { isSearch } = useSelector((state) => state.misc);
+  const { user } = useSelector((state) => state.auth);
 
   const [searchUser] = useLazySearchUserQuery();
 
@@ -71,13 +72,14 @@ const Search = () => {
         />
 
         <List>
-          {users.map((i) => (
+          {users.filter(i => i._id !== user._id).map((i) => (
+          
             <UserItem
               user={i}
               key={i._id}
               handler={addFriendHandler}
               handlerIsLoading={isLoadingSendFriendRequest}
-            />
+            />  
           ))}
         </List>
       </Stack>

@@ -22,7 +22,7 @@ const adminLogin = createAsyncThunk("admin/login", async (secretKey) => {
     throw error.response.data.message;
   }
 });
-
+ 
 const getAdmin = createAsyncThunk("admin/getAdmin", async () => {
   try {
     const { data } = await axios.get(`${server}/api/v1/admin/`, {

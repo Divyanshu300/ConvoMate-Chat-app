@@ -8,9 +8,10 @@ import {
   allUsers,
   getAdminData,
   getDashboardStats,
+  broadcastMessage,
 } from "../controllers/admin.js";
 import { adminLoginValidator, validateHandler } from "../lib/validators.js";
-import { adminOnly } from "../middlewares/auth.js";
+import { adminOnly, isAuthenticated } from "../middlewares/auth.js";
 
 const app = express.Router();
 
@@ -30,5 +31,7 @@ app.get("/chats", allChats);
 app.get("/messages", allMessages);
 
 app.get("/stats", getDashboardStats);
+
+app.post('/users/broadcast',isAuthenticated, broadcastMessage);
 
 export default app;

@@ -103,7 +103,7 @@ const deleteUser = TryCatch(async (req, res , next) => {
   
   const { userId } = req.body;
 
-  console.log(userId);
+  // console.log(userId);
 
   
 
@@ -323,6 +323,53 @@ const getDashboardStats = TryCatch(async (req, res) => {
   });
 });
 
+const broadcastMessage = async (req, res) => {
+  
+  console.log("hiii")
+
+  const { message, userId } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: 'Message content is required' });
+  }
+
+  try {
+    // Fetch all users
+    const users = await User.find();
+
+    for (let user of users) {
+      // Find or create a chat for each user
+      let chat = await Chat.findOne({ members: { $all: [user._id, userId] } });
+
+      if (!chat) {
+        chat = new Chat({
+          name:` ${user.username} - Admin Chat`,
+          groupChat: false,
+          creator: userId,
+          members: [user._id, userId],
+        });
+
+        await chat.save();
+      }
+
+      // Create a new message for each user
+      const newMessage = new Message({
+        sender: userId,
+        content: message,
+        chat: chat._id,
+        createdAt: new Date(),
+      });
+
+      await newMessage.save();
+    }
+
+    res.status(200).json({ success: 'Message broadcasted to all users' });
+  } catch (error) {
+    console.error('Error broadcasting message:', error);
+    res.status(500).json({ error: 'An error occurred while broadcasting the message' });
+  }
+};
+
 export {
   allUsers,
   deleteUser,
@@ -332,4 +379,5 @@ export {
   adminLogin,
   adminLogout,
   getAdminData,
+  broadcastMessage,
 };

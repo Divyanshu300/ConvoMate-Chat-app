@@ -6,7 +6,7 @@
 
 <h2>🚀 Demo</h2>
 
-[ConvoMate ChatApp](https://convo-mate-chat-60ycdr677-divyanshu800s-projects.vercel.app/)
+[ConvoMate ChatApp](https://convo-mate-chat-beu8s2jzt-divyanshu800s-projects.vercel.app/)
 
 
   <br></br>
